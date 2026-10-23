@@ -29,35 +29,27 @@ def validate_file(path):
                     f"{path.name}:{line_number}: invalid JSON: {error}"
                 ) from error
 
-            contents = example.get("contents")
-            if not isinstance(contents, list) or len(contents) < 2:
+            messages = example.get("messages")
+            if not isinstance(messages, list) or len(messages) < 2:
                 raise ValueError(
-                    f"{path.name}:{line_number}: invalid contents"
+                    f"{path.name}:{line_number}: missing or invalid messages list"
                 )
 
-            if contents[0].get("role") != "user":
+            if messages[0].get("role") != "user":
                 raise ValueError(
                     f"{path.name}:{line_number}: first role must be user"
                 )
 
-            if contents[-1].get("role") != "model":
+            if messages[-1].get("role") != "assistant":
                 raise ValueError(
-                    f"{path.name}:{line_number}: final role must be model"
+                    f"{path.name}:{line_number}: final role must be assistant"
                 )
 
-            for message in contents:
-                if not isinstance(message.get("parts"), list):
+            for msg in messages:
+                content = msg.get("content")
+                if not isinstance(content, str) or not content.strip():
                     raise ValueError(
-                        f"{path.name}:{line_number}: parts must be a list"
-                    )
-
-                if not any(
-                    isinstance(part.get("text"), str)
-                    and part["text"].strip()
-                    for part in message["parts"]
-                ):
-                    raise ValueError(
-                        f"{path.name}:{line_number}: missing text"
+                        f"{path.name}:{line_number}: message content must be non-empty string"
                     )
 
             count += 1

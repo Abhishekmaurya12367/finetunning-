@@ -5,8 +5,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from config import load_config
 
 TEST_PROMPTS = [
-    "Replace with your test prompt 1",
-    "Replace with your test prompt 2",
+    "Explain a linked list in simple words.",
+    "What is a stack in DSA?",
 ]
 
 
@@ -27,10 +27,15 @@ def generate(model, tokenizer, prompt: str, max_new_tokens: int) -> str:
 
 def main():
     cfg = load_config()
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+
     tokenizer = AutoTokenizer.from_pretrained(str(cfg.adapter_dir))
     base = AutoModelForCausalLM.from_pretrained(
-        cfg.model.base_model, torch_dtype=torch.float16, device_map="auto"
+        cfg.model.base_model, torch_dtype=dtype, low_cpu_mem_usage=True
     )
+    if device == "cuda":
+        base.to("cuda")
     model = PeftModel.from_pretrained(base, str(cfg.adapter_dir))
     model.eval()
     n = cfg.generation.max_new_tokens

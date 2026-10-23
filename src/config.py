@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_CONFIG = ROOT / "config.yaml"
+DEFAULT_CONFIG = ROOT / "config.yml" if (ROOT / "config.yml").exists() else ROOT / "config.yaml"
 
 
 @dataclass

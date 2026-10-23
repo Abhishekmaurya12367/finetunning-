@@ -1,0 +1,5 @@
+{"messages": [{"role": "user", "content": "Explain a linked list in simple words."}, {"role": "assistant", "content": "A linked list is a data structure made of nodes. Each node stores data and a pointer to the next node."}]}
+{"messages": [{"role": "user", "content": "What is a stack in DSA?"}, {"role": "assistant", "content": "A stack follows LIFO: Last In, First Out. Its common operations are push, pop, and top."}]}
+{"messages": [{"role": "user", "content": "Explain binary search and its complexity."}, {"role": "assistant", "content": "Binary search repeatedly halves a sorted search interval. Its time complexity is O(log n)."}]}
+{"messages": [{"role": "user", "content": "What is BFS?"}, {"role": "assistant", "content": "Breadth-First Search traverses a graph level by level, typically using a queue."}]}
+{"messages": [{"role": "user", "content": "Explain a hash map."}, {"role": "assistant", "content": "A hash map stores key-value pairs and usually provides average O(1) lookup, insertion, and deletion."}]}

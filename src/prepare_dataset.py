@@ -41,16 +41,16 @@ validation_examples = [
 ]
 
 
-def to_gemini_example(example):
+def to_chat_example(example):
     return {
-        "contents": [
+        "messages": [
             {
                 "role": "user",
-                "parts": [{"text": example["question"]}],
+                "content": example["question"],
             },
             {
-                "role": "model",
-                "parts": [{"text": example["answer"]}],
+                "role": "assistant",
+                "content": example["answer"],
             },
         ]
     }
@@ -61,7 +61,7 @@ def save_jsonl(examples, filename):
 
     with path.open("w", encoding="utf-8") as file:
         for example in examples:
-            row = to_gemini_example(example)
+            row = to_chat_example(example)
             file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     print(f"Created: {path} ({len(examples)} examples)")

@@ -1,6 +1,6 @@
 model:
-  base_model: Qwen/Qwen2.5-1.5B-Instruct
-  use_4bit: false          # true = QLoRA, needs bitsandbytes (Linux/Colab)
+  base_model: Qwen/Qwen2.5-0.5B-Instruct
+  use_4bit: false          # true = QLoRA, needs bitsandbytes (Linux/Colab with CUDA)
 
 lora:
   r: 16
@@ -10,15 +10,15 @@ lora:
 
 train:
   epochs: 3
-  batch_size: 2
-  grad_accum: 8
+  batch_size: 1
+  grad_accum: 2
   learning_rate: 0.0002
   lr_scheduler: cosine
   warmup_ratio: 0.05
-  max_length: 1024
-  logging_steps: 5
+  max_length: 512
+  logging_steps: 1
   seed: 42
-  gradient_checkpointing: true 
+  gradient_checkpointing: false
 
 data:
   train_file: data/train.jsonl

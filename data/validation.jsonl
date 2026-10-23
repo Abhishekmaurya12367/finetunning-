@@ -1,0 +1,2 @@
+{"messages": [{"role": "user", "content": "What is a queue?"}, {"role": "assistant", "content": "A queue follows FIFO: First In, First Out. Items are added at the rear and removed from the front."}]}
+{"messages": [{"role": "user", "content": "What is a binary tree?"}, {"role": "assistant", "content": "A binary tree is a tree in which each node has at most two children."}]}

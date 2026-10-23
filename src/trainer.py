@@ -24,9 +24,14 @@ class FineTuner:
         self.dataset = None
         self.trainer = None
 
-        if not torch.cuda.is_available():
-            raise SystemExit("No GPU found. Use a CUDA machine or Google Colab (T4).")
-        self.use_bf16 = torch.cuda.is_bf16_supported()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()
+        self.use_fp16 = torch.cuda.is_available() and not self.use_bf16
+
+        if self.device == "cpu":
+            print("[INFO] No CUDA GPU detected. Running locally on CPU with FP32 precision.")
+        else:
+            print(f"[INFO] Running on GPU ({torch.cuda.get_device_name(0)}).")
         set_seed(cfg.train.seed)
 
     # ---------- components ----------
@@ -37,28 +42,37 @@ class FineTuner:
 
     def load_model(self):
         m = self.cfg.model
-        compute_dtype = torch.bfloat16 if self.use_bf16 else torch.float16
 
-        if m.use_4bit:
-            bnb = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=compute_dtype,
-                bnb_4bit_use_double_quant=True,
-            )
+        if self.device == "cuda":
+            compute_dtype = torch.bfloat16 if self.use_bf16 else torch.float16
+            if m.use_4bit:
+                bnb = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_compute_dtype=compute_dtype,
+                    bnb_4bit_use_double_quant=True,
+                )
+                model = AutoModelForCausalLM.from_pretrained(
+                    m.base_model,
+                    quantization_config=bnb,
+                    torch_dtype=compute_dtype,
+                    device_map={"": 0},
+                )
+                model = prepare_model_for_kbit_training(
+                    model, use_gradient_checkpointing=self.cfg.train.gradient_checkpointing
+                )
+            else:
+                model = AutoModelForCausalLM.from_pretrained(
+                    m.base_model, torch_dtype=compute_dtype, device_map="auto"
+                )
+        else:
+            if m.use_4bit:
+                print("[WARN] 4-bit quantization (QLoRA) requires an NVIDIA GPU with CUDA. Using FP32 on CPU.")
             model = AutoModelForCausalLM.from_pretrained(
                 m.base_model,
-                quantization_config=bnb,
-                torch_dtype=compute_dtype,
-                device_map={"": 0},
+                torch_dtype=torch.float32,
+                low_cpu_mem_usage=True,
             )
-            model = prepare_model_for_kbit_training(
-                model, use_gradient_checkpointing=self.cfg.train.gradient_checkpointing
-            )
-        else:
-            # T4 has no bf16: keep fp32 weights and let fp16 autocast handle speed
-            dtype = torch.bfloat16 if self.use_bf16 else torch.float32
-            model = AutoModelForCausalLM.from_pretrained(m.base_model, torch_dtype=dtype)
 
         model.config.use_cache = False
         self.model = model
@@ -89,6 +103,7 @@ class FineTuner:
 
     def build_args(self) -> SFTConfig:
         t = self.cfg.train
+        use_cuda = (self.device == "cuda")
         return SFTConfig(
             output_dir=str(self.cfg.output_dir / "checkpoints"),
             num_train_epochs=t.epochs,
@@ -103,9 +118,10 @@ class FineTuner:
             save_strategy="epoch",
             save_total_limit=1,
             bf16=self.use_bf16,
-            fp16=not self.use_bf16,
-            gradient_checkpointing=t.gradient_checkpointing,
-            max_length=t.max_length,  # older TRL versions call this max_seq_length
+            fp16=self.use_fp16,
+            use_cpu=(not use_cuda),
+            gradient_checkpointing=t.gradient_checkpointing if use_cuda else False,
+            max_length=t.max_length,
             seed=t.seed,
             report_to="none",
         )
