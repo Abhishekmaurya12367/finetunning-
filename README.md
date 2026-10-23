@@ -1,4 +1,42 @@
+result after finetunning 
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights: 100%|█████████████████████████████████████████████████████████████████████| 290/290 [00:01<00:00, 154.48it/s]
+======================================================================
+PROMPT: Explain a linked list in simple words.
 
+--- BASE MODEL ---
+A linked list is like a line of numbered items that are connected to each other through pointers. Each item has a value and a pointer pointing to the next item in the list.
+
+For example, imagine you have a stack of blocks, where each block has a number on it. The first block has a number 1, the second block has a number 2, and so on. To access the top block (the one with the highest number), you would need to move your finger up one step at a time until you reach the end of the stack.
+
+In a linked list, this process works similarly but for a sequence of numbers instead of blocks. Each node contains a value and a reference to the next node in the list. This allows for efficient insertion and deletion of elements, as well as easy traversal of the list.
+
+--- TUNED MODEL ---
+A linked list is a data structure that consists of nodes and links between them. Each node contains data and a pointer to the next node.
+======================================================================
+PROMPT: What is a stack in DSA?
+
+--- BASE MODEL ---
+In Data Structure and Algorithms (DSA), a stack is a linear data structure that follows the Last In First Out (LIFO) principle. It consists of a collection of elements that can be pushed onto one end (top) and popped off another end (bottom). The top element of the stack is called the "top" or "most recently used" element.
+
+Here are some key points about stacks:
+
+1. **Push Operation**: Adds an element to the top of the stack.
+2. **Pop Operation**: Removes and returns the most recently added element from the top of the stack.
+3. **Top Element**: Returns the element at the top of the stack without removing it.
+4. **Empty Stack Check**: Checks if the stack is empty.
+5. **Stack Operations**: Common operations include:
+   - `push(x)`: Add an element x to the top of the stack.
+   - `pop()`: Remove and return the element at the top of the stack.
+   - `peek()`: Return the element at the top of the stack without removing it.
+   - `empty()`: Check if the stack is empty.
+
+Stacks are fundamental in many algorithms and data structures because they allow for efficient retrieval of elements based on their order. They are particularly useful when dealing with sequences where you need to access elements in a specific order, such as in sorting algorithms or in certain types of dynamic programming problems.
+
+Stacks play a crucial role in various applications, including computer science, software
+
+--- TUNED MODEL ---
+A stack is an abstract data type that follows LIFO (Last In, First Out) principle.
 LLM Fine-Tuning with LoRA
 
 A clean, config-driven pipeline to fine-tune an open-source chat LLM on your own dataset using LoRA (Low-Rank Adaptation). No cloud bucket or paid API is required. It runs on a local NVIDIA GPU or on a free Google Colab T4.
