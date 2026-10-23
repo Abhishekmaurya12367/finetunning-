@@ -103,7 +103,14 @@ class FineTuner:
 
     def build_args(self) -> SFTConfig:
         t = self.cfg.train
-        use_cuda = (self.device == "cuda")
+
+        # warmup_ratio was removed in newer transformers, so compute steps manually
+        steps_per_epoch = math.ceil(
+            len(self.dataset["train"]) / (t.batch_size * t.grad_accum)
+        )
+        total_steps = steps_per_epoch * t.epochs
+        warmup_steps = max(1, int(total_steps * t.warmup_ratio))
+
         return SFTConfig(
             output_dir=str(self.cfg.output_dir / "checkpoints"),
             num_train_epochs=t.epochs,
@@ -112,20 +119,18 @@ class FineTuner:
             gradient_accumulation_steps=t.grad_accum,
             learning_rate=t.learning_rate,
             lr_scheduler_type=t.lr_scheduler,
-            warmup_ratio=t.warmup_ratio,
+            warmup_steps=warmup_steps,
             logging_steps=t.logging_steps,
             eval_strategy="epoch",
             save_strategy="epoch",
             save_total_limit=1,
             bf16=self.use_bf16,
-            fp16=self.use_fp16,
-            use_cpu=(not use_cuda),
-            gradient_checkpointing=t.gradient_checkpointing if use_cuda else False,
+            fp16=not self.use_bf16,
+            gradient_checkpointing=t.gradient_checkpointing,
             max_length=t.max_length,
             seed=t.seed,
             report_to="none",
         )
-
     def build_trainer(self):
         self.trainer = SFTTrainer(
             model=self.model,

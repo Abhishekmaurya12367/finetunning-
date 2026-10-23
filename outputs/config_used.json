@@ -1,0 +1,35 @@
+{
+  "model": {
+    "base_model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "use_4bit": false
+  },
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": "all-linear"
+  },
+  "train": {
+    "epochs": 3,
+    "batch_size": 1,
+    "grad_accum": 2,
+    "learning_rate": 0.0002,
+    "lr_scheduler": "cosine",
+    "warmup_ratio": 0.05,
+    "max_length": 512,
+    "logging_steps": 1,
+    "seed": 42,
+    "gradient_checkpointing": false
+  },
+  "data": {
+    "train_file": "data/train.jsonl",
+    "validation_file": "data/validation.jsonl"
+  },
+  "generation": {
+    "max_new_tokens": 300
+  },
+  "output": {
+    "output_dir": "outputs",
+    "adapter_name": "lora_adapter"
+  }
+}
