@@ -4,7 +4,7 @@ Loading weights: 100%|███████████████████�
 ======================================================================
 PROMPT: Explain a linked list in simple words.
 
---- BASE MODEL ---
+--- BASE MODEL -----
 A linked list is like a line of numbered items that are connected to each other through pointers. Each item has a value and a pointer pointing to the next item in the list.
 
 For example, imagine you have a stack of blocks, where each block has a number on it. The first block has a number 1, the second block has a number 2, and so on. To access the top block (the one with the highest number), you would need to move your finger up one step at a time until you reach the end of the stack.
