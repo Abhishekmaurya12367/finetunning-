@@ -1,4 +1,4 @@
-result after finetunning 
+
 [transformers] `torch_dtype` is deprecated! Use `dtype` instead!
 Loading weights: 100%|█████████████████████████████████████████████████████████████████████| 290/290 [00:01<00:00, 154.48it/s]
 ======================================================================
